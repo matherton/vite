@@ -184,10 +184,13 @@ export function watchPackageDataPlugin(config: ResolvedConfig): Plugin {
   }
 }
 
+const cache = new Map<string, string>()
+
 export function resolvePkgJsonPath(
   pkgName: string,
   basedir: string,
   preserveSymlinks = false,
+  // cache?: Map<string, string>,
 ): string | undefined {
   if (pnp) {
     const pkg = pnp.resolveToUnqualified(pkgName, basedir)
@@ -197,10 +200,36 @@ export function resolvePkgJsonPath(
 
   let root = basedir
   while (root) {
+    const cacheKey = `${root}&${pkgName}&${preserveSymlinks}`
+    if (cache?.has(cacheKey)) {
+      const matched = cache.get(cacheKey)!
+      // cache all traversed root by this while loop
+      let traversedRoot = basedir
+      while (traversedRoot !== root) {
+        cache.set(`${traversedRoot}&${pkgName}&${preserveSymlinks}`, matched)
+        traversedRoot = path.dirname(traversedRoot)
+      }
+      return matched
+    }
+
     const pkg = path.join(root, 'node_modules', pkgName, 'package.json')
     try {
       if (fs.existsSync(pkg)) {
-        return preserveSymlinks ? pkg : safeRealpathSync(pkg)
+        const matched = preserveSymlinks ? pkg : safeRealpathSync(pkg)
+        if (matched && cache) {
+          // cache root itself
+          cache.set(cacheKey, matched)
+          // cache all traversed root by this while loop
+          let traversedRoot = basedir
+          while (traversedRoot !== root) {
+            cache.set(
+              `${traversedRoot}&${pkgName}&${preserveSymlinks}`,
+              matched,
+            )
+            traversedRoot = path.dirname(traversedRoot)
+          }
+        }
+        return matched
       }
     } catch {}
     const nextRoot = path.dirname(root)
