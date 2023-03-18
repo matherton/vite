@@ -818,6 +818,7 @@ importers:
       '@vitejs/test-resolve-exports-with-module': link:./exports-with-module
       '@vitejs/test-resolve-imports-pkg': link:./imports-path/other-pkg
       '@vitejs/test-resolve-linked': workspace:*
+      '@vitejs/test-resolve-sharp-dir': link:./sharp-dir
       es5-ext: 0.10.62
       normalize.css: ^8.0.1
     dependencies:
@@ -837,6 +838,7 @@ importers:
       '@vitejs/test-resolve-exports-with-module': link:exports-with-module
       '@vitejs/test-resolve-imports-pkg': link:imports-path/other-pkg
       '@vitejs/test-resolve-linked': link:../resolve-linked
+      '@vitejs/test-resolve-sharp-dir': link:sharp-dir
       es5-ext: 0.10.62
       normalize.css: 8.0.1
 
@@ -913,6 +915,12 @@ importers:
       bignumber.js: 9.1.1
     dependencies:
       bignumber.js: 9.1.1
+
+  playground/resolve/sharp-dir:
+    specifiers:
+      es5-ext: 0.10.62
+    dependencies:
+      es5-ext: 0.10.62
 
   playground/ssr-deps:
     specifiers:
